@@ -9,9 +9,9 @@ sudo hostnamectl set-hostname k8s-master
 This sets the system's hostname to k8s-master.
 💡 Why:
 
-    Makes it easier to identify the node in your cluster.
+Makes it easier to identify the node in your cluster.
 
-    Helpful when managing multiple nodes (e.g., k8s-worker-1, k8s-master).
+Helpful when managing multiple nodes (e.g., k8s-worker-1, k8s-master).
 
 
 🔕 Step 2: Disable Swap
@@ -29,9 +29,9 @@ sudo sed -i '/ swap / s/^/#/' /etc/fstab
 
 💡 Why:
 
-    Kubernetes requires RAM-only memory management.
+Kubernetes requires RAM-only memory management.
 
-    Swap can cause unpredictable performance and violates Kubernetes resource scheduling logic.
+Swap can cause unpredictable performance and violates Kubernetes resource scheduling logic.
 
 
 📦 Step 3: Install Container Runtime (containerd)
@@ -41,13 +41,13 @@ sudo apt install -y containerd
 ```
 🔍 What it does:
 
-    Updates the package list and installs containerd, which is a container runtime.
+Updates the package list and installs containerd, which is a container runtime.
 
 💡 Why:
 
-    Kubernetes doesn’t run containers itself. It needs a container runtime (like Docker or containerd) to manage containers.
+Kubernetes doesn’t run containers itself. It needs a container runtime (like Docker or containerd) to manage containers.
 
-    containerd is lightweight, fast, and officially supported by Kubernetes.
+containerd is lightweight, fast, and officially supported by Kubernetes.
 
 
 Generate default config:
@@ -57,7 +57,7 @@ containerd config default | sudo tee /etc/containerd/config.tom
 ```
 🔍 What it does:
 
-    Prepares the config directory and writes the default configuration of containerd to config.toml.
+Prepares the config directory and writes the default configuration of containerd to config.toml.
 
 💡 Why:
 
@@ -71,13 +71,13 @@ sudo sed -i 's/SystemdCgroup = false/SystemdCgroup = true/' /etc/containerd/conf
 ```
 🔍 What it does:
 
-    Changes the containerd setting to use systemd for cgroup (control group) management.
+Changes the containerd setting to use systemd for cgroup (control group) management.
 
 💡 Why:
 
-    Kubernetes and systemd need to use the same cgroup driver to avoid instability.
+Kubernetes and systemd need to use the same cgroup driver to avoid instability.
 
-    Systemd is the default init system in modern Linux distros (like Ubuntu), so aligning both improves compatibility.
+Systemd is the default init system in modern Linux distros (like Ubuntu), so aligning both improves compatibility.
 
 
 Restart and enable:
@@ -87,13 +87,13 @@ sudo systemctl enable containerd
 ```
 🔍 What it does:
 
-    Restarts containerd to apply changes.
+Restarts containerd to apply changes.
 
-    Enables it to start at boot.
+Enables it to start at boot.
 
 💡 Why:
 
-    Ensures containerd is running with the correct config every time the system boot
+Ensures containerd is running with the correct config every time the system boot
 
 
 🌉 Step 4: Load Kernel Modules & sysctl Settings
@@ -108,15 +108,15 @@ sudo modprobe br_netfilter
 ```
 🔍 What it does:
 
-    Configures and loads required kernel modules:
+Configures and loads required kernel modules:
 
-        overlay: Required for container image layering.
+overlay: Required for container image layering.
 
-        br_netfilter: Enables iptables to see bridged traffic.
+br_netfilter: Enables iptables to see bridged traffic.
 
 💡 Why:
 
-    Necessary for network communication between containers and between pods across nodes.
+Necessary for network communication between containers and between pods across nodes.
 
 
 Enable networking settings:
@@ -131,11 +131,11 @@ sudo sysctl --system
 ```
 🔍 What it does:
 
-    Configures system-wide networking rules to allow proper packet forwarding and firewalling for bridges (used by Kubernetes networking).
+Configures system-wide networking rules to allow proper packet forwarding and firewalling for bridges (used by Kubernetes networking).
 
 💡 Why:
 
-    Pods communicate across the cluster using bridges, and this sysctl tuning ensures traffic is allowed and properly routed.
+Pods communicate across the cluster using bridges, and this sysctl tuning ensures traffic is allowed and properly routed.
 
 
 🧩 Step 5: Install Kubernetes Components (kubelet, kubeadm, kubectl)
@@ -149,9 +149,9 @@ curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.28/deb/Release.key | sudo gpg --
 ```
 🔍 What it does:
 
-    Clears any old repo list.
+Clears any old repo list.
 
-    Adds Kubernetes's new repository signing key in a modern and secure format.
+Adds Kubernetes's new repository signing key in a modern and secure format.
 
 ```bash
 echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.28/deb/ /' | \
@@ -160,9 +160,9 @@ sudo apt update
 ```
 🔍 What it does:
 
-    Adds the Kubernetes package repository (v1.28).
+Adds the Kubernetes package repository (v1.28).
 
-    Updates the package list.
+Updates the package list.
 
 
 🧱 Install Kubernetes tools:
@@ -173,15 +173,15 @@ sudo apt-mark hold kubelet kubeadm kubectl  # Prevent auto-upgrade
 ```
 🔍 What it does:
 
-    Installs core Kubernetes components:
+Installs core Kubernetes components:
 
-        kubelet: Runs and manages containers on this node.
+kubelet: Runs and manages containers on this node.
 
-        kubeadm: Initializes and manages the cluster.
+kubeadm: Initializes and manages the cluster.
 
-        kubectl: CLI tool to interact with the cluster.
+kubectl: CLI tool to interact with the cluster.
 
-    apt-mark hold: Prevents accidental upgrades that could break the setup.
+apt-mark hold: Prevents accidental upgrades that could break the setup.
 
 
  🚀 Step 6: Initialize the Master Node
@@ -194,13 +194,13 @@ sudo kubeadm init --pod-network-cidr=192.168.0.0/16
 
 🔍 What it does:
 
-    Bootstraps a new Kubernetes cluster using kubeadm.
+Bootstraps a new Kubernetes cluster using kubeadm.
 
-    --pod-network-cidr: Specifies the IP range that the pod network plugin will use (Flannel uses 192.168.0.0/16).
+--pod-network-cidr: Specifies the IP range that the pod network plugin will use (Flannel uses 192.168.0.0/16).
 
 💡 Why:
 
-    Essential to define the network plugin’s expected range during cluster initialization.
+Essential to define the network plugin’s expected range during cluster initialization.
 
 
 👤 Step 7: Set kubectl Access for Your User
@@ -213,11 +213,11 @@ sudo chown $(id -u):$(id -g) $HOME/.kube/config
 ```
 🔍 What it does:
 
-    Sets up kubectl so it can talk to the cluster using the admin credentials stored in admin.conf.
+Sets up kubectl so it can talk to the cluster using the admin credentials stored in admin.conf.
 
 💡 Why:
 
-    Without this, you’ll get permission or context errors using kubectl.
+Without this, you’ll get permission or context errors using kubectl.
 
 🌐 Step 8: Apply Pod Network Add-on (Flannel)
 ```bash
@@ -228,13 +228,13 @@ Wait 30–60 seconds and check pod/network status:
 
 🔍 What it does:
 
-    Applies the Flannel network plugin configuration.
+Applies the Flannel network plugin configuration.
 
 💡 Why:
 
-    Kubernetes doesn’t include a network plugin by default.
+Kubernetes doesn’t include a network plugin by default.
 
-    Flannel allows pods to communicate across nodes by creating a virtual overlay network.
+Flannel allows pods to communicate across nodes by creating a virtual overlay network.
 
 
 🚫 Step 9: (Optional) Allow Workloads on Master Node
@@ -243,13 +243,13 @@ kubectl taint nodes --all node-role.kubernetes.io/control-plane-
 ```
 🔍 What it does:
 
-    Removes the taint that prevents pods from running on the master node.
+Removes the taint that prevents pods from running on the master node.
 
 💡 Why:
 
-    For single-node clusters, you often want to run pods on the master for testing.
+For single-node clusters, you often want to run pods on the master for testing.
 
-    Not needed if you have dedicated worker nodes.
+Not needed if you have dedicated worker nodes.
 
 
 
@@ -259,9 +259,9 @@ kubectl get nodes
 kubectl get pods -n kube-flannel
 
 ```
-    See if the master node is Ready.
+See if the master node is Ready.
 
-    Check if Flannel pods are running successfully.
+Check if Flannel pods are running successfully.
 
 
 
@@ -270,16 +270,16 @@ kubectl get pods -n kube-flannel
 
 This setup configures your Ubuntu VM as a fully functional Kubernetes master node, including:
 
-    Swap off (Kubernetes requirement)
+a) Swap off (Kubernetes requirement)
 
-    containerd setup (runtime)
+b) containerd setup (runtime)
 
-    Network configuration (sysctl, kernel modules)
+c) Network configuration (sysctl, kernel modules)
 
-    Kubernetes components install
+d) Kubernetes components install
 
-    Cluster initialization
+e) Cluster initialization
 
-    Networking with Flannel
+f) Networking with Flannel
 
-    Access with kubectl
+g) Access with kubectl
