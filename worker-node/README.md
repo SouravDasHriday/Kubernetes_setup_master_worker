@@ -25,9 +25,9 @@ sudo sed -i '/ swap / s/^/#/' /etc/fstab
 
 🔍 What it does:
 
-    swapoff -a: Disables swap now.
+swapoff -a: Disables swap now.
 
-    sed ...: Comments out the swap line in /etc/fstab to keep it off on boot.
+sed ...: Comments out the swap line in /etc/fstab to keep it off on boot.
 
 💡 Why:
 
@@ -84,11 +84,11 @@ sudo modprobe br_netfilter
 
 🔍 What it does:
 
-    Configures and loads kernel modules needed for container networking.
+Configures and loads kernel modules needed for container networking.
 
-    overlay supports layered file systems for containers.
+overlay supports layered file systems for containers.
 
-    br_netfilter enables iptables to see traffic from virtual bridges.
+br_netfilter enables iptables to see traffic from virtual bridges.
 
 🔧 Step 5: Apply sysctl settings
 
@@ -106,12 +106,12 @@ sudo sysctl --system
 
 These settings:
 
-    Enable forwarding of network packets between pods/nodes.
+Enable forwarding of network packets between pods/nodes.
 
-    Allow bridged network traffic (from containers) to be filtered through iptables.
+Allow bridged network traffic (from containers) to be filtered through iptables.
 
 
-    🔑 Step 6: Add Kubernetes Repo and Install Components
+🔑 Step 6: Add Kubernetes Repo and Install Components
 
 ```bash
 sudo rm -f /etc/apt/sources.list.d/kubernetes.list
@@ -121,9 +121,10 @@ curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.28/deb/Release.key | sudo gpg --
 
 🔍 What it does:
 
-    Cleans up old repo files if they exist.
+Cleans up old repo files if they exist.
 
-    Adds the official Kubernetes signing key in a secure format.
+Adds the official Kubernetes signing key in a secure format.
+
 ```bash
 echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.28/deb/ /' | \
 sudo tee /etc/apt/sources.list.d/kubernetes.list
@@ -141,15 +142,15 @@ sudo apt-mark hold kubelet kubeadm kubectl
 ```
 🔍 What it does:
 
-    Installs the core Kubernetes components.
+Installs the core Kubernetes components.
 
-        kubelet: Agent running on all nodes, starts pods/containers.
+kubelet: Agent running on all nodes, starts pods/containers.
 
-        kubeadm: Used to join the cluster.
+kubeadm: Used to join the cluster.
 
-        kubectl: Optional on workers, but useful for debugging.
+kubectl: Optional on workers, but useful for debugging.
 
-    Holds the versions to avoid unwanted upgrades.
+Holds the versions to avoid unwanted upgrades.
 
 🔗 Step 7: Join the Cluster (The Key Step)
 
@@ -160,9 +161,9 @@ kubeadm join <MASTER-IP>:6443 --token <TOKEN> \
 
 🔍 What it does:
 
-    Connects the worker to the master via secure communication.
+Connects the worker to the master via secure communication.
 
-    Uses the provided token and hash to authenticate and verify the cluster.
+Uses the provided token and hash to authenticate and verify the cluster.
 
 💡 How to get this command again:
 
@@ -186,9 +187,9 @@ kubectl get nodes
 
 Lists all nodes in the cluster.
 
-    Master and all joined workers should appear.
+Master and all joined workers should appear.
 
-    Status should be Ready once networking is up.
+Status should be Ready once networking is up.
 
 🧠 Summary: What Happens Internally
 | Action                       | Purpose                                                |
